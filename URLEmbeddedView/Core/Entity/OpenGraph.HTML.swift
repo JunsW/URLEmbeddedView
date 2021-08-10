@@ -20,9 +20,6 @@ extension OpenGraph {
                     // "" & ""
                     "(?:content\\s*=\\s*\"([^>]*)\"\\s*property\\s*=\\s*\"([^>]*)\")",
                     "(?:property\\s*=\\s*\"([^>]*)\"\\s*content\\s*=\\s*\"([^>]*)\")",
-                    // name instead of property
-                    "(?:content\\s*=\\s*\"([^>]*)\"\\s*name\\s*=\\s*\"([^>]*)\")",
-                    "(?:name\\s*=\\s*\"([^>]*)\"\\s*content\\s*=\\s*\"([^>]*)\")",
                     // '' & ''
                     "(?:content\\s*=\\s*'([^>]*)'\\s*property\\s*=\\s*'([^>]*)')",
                     "(?:property\\s*=\\s*'([^>]*)'\\s*content\\s*=\\s*'([^>]*)')",
@@ -33,8 +30,8 @@ extension OpenGraph {
                     "(?:content\\s*=\\s*'([^>]*)'\\s*property\\s*=\\s*\"([^>]*)\")",
                     "(?:property\\s*=\\s*'([^>]*)'\\s*content\\s*=\\s*\"([^>]*)\")"
                 ]
-                let pattern = "meta\\s*\(patterns.joined(separator: "|"))\\s*>?"
-                return try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
+                let pattern = "meta\\s*\(patterns.joined(separator: "|"))\\s*/?>"
+                return try? NSRegularExpression(pattern: pattern, options: [])
             }()
         }
 
@@ -70,7 +67,7 @@ extension OpenGraph {
             guard let regex = Const.regex else { return nil }
             let range = NSRange(htmlString.startIndex..<htmlString.endIndex, in: htmlString)
             let results = regex.matches(in: htmlString, options: [], range: range)
-            let metaList: [Metadata] = results.compactMap { result in
+            var metaList: [Metadata] = results.compactMap { result in
                 guard result.numberOfRanges > 2 else { return nil }
                 let initial = Metadata(property: "", content: "")
                 let metaData = (0..<result.numberOfRanges).reduce(initial) { metadata, index in
@@ -84,6 +81,14 @@ extension OpenGraph {
                     return Metadata(property: metadata.property, content: substring)
                 }
                 return metaData.isValid ? metaData : nil
+            }
+            if !metaList.contains(where: { $0.property == "og:title" }) {
+                let title = "(?<=title>).*(?=</title>)"
+                let regex = try? NSRegularExpression(pattern: title, options: [])
+                if let result = regex?.firstMatch(in: htmlString, options: [], range: range) {
+                    let ret = (htmlString as NSString).substring(with: result.range)
+                    metaList.append(Metadata(property: "og:title", content: ret))
+                }
             }
             if metaList.isEmpty { return nil }
             self.metaList = metaList
