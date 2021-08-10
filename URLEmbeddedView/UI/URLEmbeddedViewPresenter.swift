@@ -9,7 +9,7 @@
 import Foundation
 
 /// Use for Test
-protocol URLEmbeddedViewPresenterProtocol: class {
+protocol URLEmbeddedViewPresenterProtocol: AnyObject {
     var shouldContinueDownloadingWhenCancel: Bool { get set }
     var url: URL? { get }
     func setURLString(_ urlString: String)
@@ -21,7 +21,7 @@ protocol URLEmbeddedViewPresenterProtocol: class {
 final class URLEmbeddedViewPresenter: URLEmbeddedViewPresenterProtocol {
 
     private struct Const {
-        static let faviconURL = "http://www.google.com/s2/favicons?domain="
+        static let faviconURL = "https://api.faviconkit.com/"
     }
 
     private weak var view: URLEmbeddedViewProtocol?
