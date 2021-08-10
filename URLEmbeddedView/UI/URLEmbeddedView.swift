@@ -118,8 +118,6 @@ protocol URLEmbeddedViewProtocol: class {
     }
     
     fileprivate func setInitialiValues() {
-        borderColor = .lightGray
-        borderWidth = 1
         cornerRaidus = 8
     }
     
@@ -146,12 +144,13 @@ protocol URLEmbeddedViewProtocol: class {
         
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 8
         addSubview(imageView)
         addConstraints(with: imageView,
-                       edges: .init(top: 0, left: 0, bottom: 0))
+                       edges: .init(top: 4, left: 4, bottom: -4))
         changeImageViewWidthConstrain(nil)
         
-        titleLabel.numberOfLines = textProvider[.title].numberOfLines
+        titleLabel.numberOfLines = 1//textProvider[.title].numberOfLines
         addSubview(titleLabel)
         addConstraints(with: titleLabel,
                        edges: .init(top: 8, right: -12))
@@ -176,7 +175,7 @@ protocol URLEmbeddedViewProtocol: class {
                             constant: 12))
         changeDomainContainerHeightConstraint()
         
-        descriptionLabel.numberOfLines = textProvider[.description].numberOfLines
+        descriptionLabel.numberOfLines = 1//textProvider[.description].numberOfLines
         addSubview(descriptionLabel)
         addConstraints(with: descriptionLabel, edges: .init(right: -12))
         addConstraints(with: descriptionLabel,
